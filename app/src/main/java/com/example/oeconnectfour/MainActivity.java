@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,10 +16,11 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     Game game = new Game();
+    float leftMostX = 147.0f;
+    float distanceBetweenCells = 168.0f;
     int arrowColumn = 3;    //Used to calculate position of next token to be dropped over board
     int numRows = 6;
     int numCols = 7;
-
 
     //Game class
     public class Game {
@@ -85,16 +87,18 @@ public class MainActivity extends AppCompatActivity {
         Token[][] board = new Token[6][7];
 
         public Board() {
+            /*
             for (Token[] row : board) {
                 Arrays.fill(row, new Token(0));
             }
-            /*
-            for(int i = 0; i < numRows; ++i) {
-                for(int j = 0; j < numCols; ++j) {
-                    board[i][j] = new Token(0);
+            */
+            for(int i = 0; i < 6; ++i) {
+                for(int j = 0; j < 7; ++j) {
+                    Token temp = new Token(0);
+                    board[i][j] = temp;
                 }
             }
-            */
+
             //Token[] row = new Token[7];
             //Arrays.fill(row, new Token(0));
             //Arrays.fill(board, row);
@@ -316,6 +320,7 @@ public class MainActivity extends AppCompatActivity {
         int player = 0;
         int strength = 0;
         Random random = new Random();
+        ImageView tokenImage;
         //Create token for player 1 or 2 and give it a strength
         public Token(int playerIndex) {
             this.player = playerIndex;
@@ -343,6 +348,7 @@ public class MainActivity extends AppCompatActivity {
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
             nextToken.animate().translationXBy(-168).setDuration(100);
+            nextToken.setX(leftMostX + arrowColumn * distanceBetweenCells);
         }
     }
 
@@ -352,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
             nextToken.animate().translationXBy(168).setDuration(100);
+            nextToken.setX(leftMostX + arrowColumn * distanceBetweenCells);
         }
     }
 
@@ -403,9 +410,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             //Put droppedToken in the same position as nextToken
-            //droppedToken.setX(originalX);
-            //droppedToken.setY(originalY);
-            droppedToken.setLayoutParams(nextToken.getLayoutParams());  //Copy layout params
+            droppedToken.setAdjustViewBounds(true);
+            droppedToken.setX(147.0f + arrowColumn * distanceBetweenCells);
+            droppedToken.setY(182.0f);
+            droppedToken.setMaxHeight(140);
+            droppedToken.setMaxWidth(140);
+            //droppedToken.setLayoutParams(nextToken.getLayoutParams());  //Copy layout params
             //Add droppedToken to the layout
             ConstraintLayout overall = findViewById(R.id.overall);
             overall.addView(droppedToken);
