@@ -3,6 +3,7 @@ package com.example.oeconnectfour;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,8 +16,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    Game game = new Game();
-    float leftMostX = 147.0f;
+    Game game;
+    float leftTopX = 147.0f;
+    float leftTopY = 350.0f;
     float distanceBetweenCells = 168.0f;
     int arrowColumn = 3;    //Used to calculate position of next token to be dropped over board
     int numRows = 6;
@@ -57,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
             return choiceRow;
         }
 
+        //Updates cell image to same as droppedToken
+        public void updateBoardToDropped(int row, int col, int droppedTokenImageRes) {
+            board.changeCellImage(row, col, droppedTokenImageRes);
+        }
+
         //Breaks all tokens that are under too much stress
         public void breakTokens(int col) {
             board.breakTokens(col);
@@ -87,21 +94,16 @@ public class MainActivity extends AppCompatActivity {
         Token[][] board = new Token[6][7];
 
         public Board() {
-            /*
-            for (Token[] row : board) {
-                Arrays.fill(row, new Token(0));
-            }
-            */
             for(int i = 0; i < 6; ++i) {
                 for(int j = 0; j < 7; ++j) {
                     Token temp = new Token(0);
+                    temp.tokenImage.setAdjustViewBounds(true);
+                    //Set the Token's position on the board
+                    temp.tokenImage.setX(leftTopX + (float) j * distanceBetweenCells);
+                    temp.tokenImage.setY(leftTopY + (float) i * distanceBetweenCells);
                     board[i][j] = temp;
                 }
             }
-
-            //Token[] row = new Token[7];
-            //Arrays.fill(row, new Token(0));
-            //Arrays.fill(board, row);
         }
 
         //Returns 1 if player 1 has a winning combo, 2 if player 2, 0 if neither, 3 if both (tie)
@@ -137,6 +139,19 @@ public class MainActivity extends AppCompatActivity {
         public void placeToken(int row, int col, Token token) {
             board[row][col].player = token.player;
             board[row][col].strength = token.strength;
+        }
+
+        //Changes ImageView of Token at cell to input
+        public void changeCellImage(int row, int col, int resource) {
+            board[row][col].tokenImage.setImageResource(resource);
+            //Set tokenImage's size
+            board[row][col].tokenImage.setAdjustViewBounds(true);
+            board[row][col].tokenImage.setMaxHeight(140);
+            board[row][col].tokenImage.setMaxWidth(140);
+            //Add tokenImage to the layout
+            ConstraintLayout overall = findViewById(R.id.overall);
+            overall.addView(board[row][col].tokenImage);
+            //board[3][3].tokenImage.setImageResource(R.drawable.red1);
         }
 
         //Breaks all tokens that need breaking
@@ -320,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
         int player = 0;
         int strength = 0;
         Random random = new Random();
-        ImageView tokenImage;
+        ImageView tokenImage = new ImageView(getApplicationContext());
         //Create token for player 1 or 2 and give it a strength
         public Token(int playerIndex) {
             this.player = playerIndex;
@@ -347,8 +362,8 @@ public class MainActivity extends AppCompatActivity {
             arrowColumn--;
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
-            nextToken.animate().translationXBy(-168).setDuration(100);
-            nextToken.setX(leftMostX + arrowColumn * distanceBetweenCells);
+            nextToken.animate().translationXBy(-168).setDuration(50);
+            nextToken.setX(leftTopX + arrowColumn * distanceBetweenCells);
         }
     }
 
@@ -357,8 +372,8 @@ public class MainActivity extends AppCompatActivity {
             arrowColumn++;
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
-            nextToken.animate().translationXBy(168).setDuration(100);
-            nextToken.setX(leftMostX + arrowColumn * distanceBetweenCells);
+            nextToken.animate().translationXBy(168).setDuration(50);
+            nextToken.setX(leftTopX + arrowColumn * distanceBetweenCells);
         }
     }
 
@@ -380,22 +395,26 @@ public class MainActivity extends AppCompatActivity {
 
             //Store position of nextToken (token hanging over the board)
             ImageView nextToken = findViewById(R.id.nextToken);
-            float originalX = nextToken.getX();
-            float originalY = nextToken.getY();
+            //float originalX = nextToken.getX();
+            //float originalY = nextToken.getY();
 
             //Create actual token that is to be dropped
             ImageView droppedToken = new ImageView(this);
+            int droppedTokenImageRes;
             //If player 1's turn
             if(game.currentTurn == 1) {
                 //Give token appropriate image
                 if(game.currentToken.strength == 6) {
                     droppedToken.setImageResource(R.drawable.red1);
+                    droppedTokenImageRes = R.drawable.red1;
                 }
                 else if(game.currentToken.strength == 3) {
                     droppedToken.setImageResource(R.drawable.red2);
+                    droppedTokenImageRes = R.drawable.red2;
                 }
                 else {
                     droppedToken.setImageResource(R.drawable.red3);
+                    droppedTokenImageRes = R.drawable.red3;
                 }
             }
             //If player 2's turn
@@ -403,10 +422,13 @@ public class MainActivity extends AppCompatActivity {
                 //Give token appropriate image
                 if (game.currentToken.strength == 6) {
                     droppedToken.setImageResource(R.drawable.yellow1);
+                    droppedTokenImageRes = R.drawable.yellow1;
                 } else if (game.currentToken.strength == 3) {
                     droppedToken.setImageResource(R.drawable.yellow2);
+                    droppedTokenImageRes = R.drawable.yellow2;
                 } else {
                     droppedToken.setImageResource(R.drawable.yellow3);
+                    droppedTokenImageRes = R.drawable.yellow3;
                 }
             }
             //Put droppedToken in the same position as nextToken
@@ -415,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
             droppedToken.setY(182.0f);
             droppedToken.setMaxHeight(140);
             droppedToken.setMaxWidth(140);
-            //droppedToken.setLayoutParams(nextToken.getLayoutParams());  //Copy layout params
+
             //Add droppedToken to the layout
             ConstraintLayout overall = findViewById(R.id.overall);
             overall.addView(droppedToken);
@@ -423,12 +445,16 @@ public class MainActivity extends AppCompatActivity {
             //Make nextToken transparent as droppedToken is falling into position
             nextToken.setAlpha(0.0f);
 
-            //TODO: Animate droppedToken dropping into position
+            //Animate droppedToken dropping into position
             //Use boxHeight and tokenRow to calculate how far token has to travel
             int distanceMoved = boxHeight * (tokenRow + 1);
             droppedToken.animate().translationYBy(distanceMoved).setDuration(100);
 
-            //TODO: Change image on board to same as droppedToken
+            //Change image on board to same as droppedToken
+            game.updateBoardToDropped(tokenRow, arrowColumn, droppedTokenImageRes);
+
+            //Delete droppedToken
+            overall.removeView(droppedToken);
 
             //TODO: Break any tokens that need breaking
             //game.breakTokens(arrowColumn);
@@ -477,6 +503,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        game = new Game();
     }
 
     @Override
