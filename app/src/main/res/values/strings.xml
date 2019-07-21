@@ -3,4 +3,6 @@
     <string name="Drop">DROP</string>
     <string name="Right">RIGHT</string>
     <string name="Left">LEFT</string>
+    <string name="winnerOne">Player 1 has won!</string>
+    <string name="winnerTwo">Player 2 has won!</string>
 </resources>
