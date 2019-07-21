@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -204,13 +206,18 @@ public class MainActivity extends AppCompatActivity {
                     //board[i][col].explosionImage.animate().alpha(1.0f).setDuration(100);
                     //board[i][col].explosionImage.animate().alpha(0.0f).setDuration(100);
                     //Fade broken token away
-                    //board[i][col].tokenImage.animate().alpha(0.0f).setDuration(200);
+                    AlphaAnimation fadeBroken = new AlphaAnimation(1.0f, 0.0f);
+                    fadeBroken.setDuration(200);
+                    board[i][col].tokenImage.startAnimation(fadeBroken);
+
                     //Move all tokens above it down by one spot
                     for(int j = i; j > 0; --j) {
                         //TranslateAnimation moveDown = new TranslateAnimation(board[j][col].tokenImage.getX(), board[j][col].tokenImage.getX(), board[j][col].tokenImage.getY(), board[j][col].tokenImage.getY() + distanceBetweenCells);
                         TranslateAnimation moveDown = new TranslateAnimation(0, 0, 0, distanceBetweenCells);
                         moveDown.setDuration(200);
-                        //board[j][col].tokenImage.startAnimation(moveDown);
+                        moveDown.setStartOffset(200);
+                        board[j][col].tokenImage.startAnimation(moveDown);
+
                         final int finalCol = col;
                         final int finalRow = j;
                         moveDown.setAnimationListener(new Animation.AnimationListener() {
@@ -255,8 +262,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onAnimationRepeat(Animation animation) {
                             }
                         });
-                        //board[j][col].tokenImage.animate().translationYBy(distanceBetweenCells);
-                        board[j][col].tokenImage.startAnimation(moveDown);
                     }
                     //Insert new unoccupied token in row 0
                     board[0][col].player = 0;
@@ -264,11 +269,14 @@ public class MainActivity extends AppCompatActivity {
                     board[0][col].tokenImage.setImageResource(R.drawable.unoccupied);
                     //Reset i to 5
                     i = 5;
+                    return;
                 }
                 else {
                     i--;
                 }
+
             }
+            return;
             /*
             for(int i = 5; i >= 0; --i) {
                 topTokenRow = lowestRow(col);
