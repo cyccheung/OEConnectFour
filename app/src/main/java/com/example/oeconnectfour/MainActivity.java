@@ -21,9 +21,9 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     Game game;
-    float leftTopX = 140.0f;
-    float leftTopY = 310.0f;
-    float distanceBetweenCells = 168.0f;
+    float leftTopX = 60.0f;
+    float leftTopY = 230.0f;
+    float distanceBetweenCells = 140.0f;
     int arrowColumn = 3;    //Used to calculate position of next token to be dropped over board
     int numRows = 6;
     int numCols = 7;
@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
                     temp.tokenImage.setX(leftTopX + (float) j * distanceBetweenCells);
                     temp.tokenImage.setY(leftTopY + (float) i * distanceBetweenCells);
                     temp.tokenImage.setImageResource(R.drawable.unoccupied);
-                    temp.tokenImage.setMaxHeight(150);
-                    temp.tokenImage.setMaxWidth(150);
+                    temp.tokenImage.setMaxHeight(120);
+                    temp.tokenImage.setMaxWidth(120);
                     board[i][j] = temp;
                     overall.addView(board[i][j].tokenImage);
                 }
