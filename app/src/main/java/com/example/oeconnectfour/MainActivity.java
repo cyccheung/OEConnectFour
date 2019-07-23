@@ -21,8 +21,8 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     Game game;
-    float leftTopX = 147.0f;
-    float leftTopY = 350.0f;
+    float leftTopX = 140.0f;
+    float leftTopY = 310.0f;
     float distanceBetweenCells = 168.0f;
     int arrowColumn = 3;    //Used to calculate position of next token to be dropped over board
     int numRows = 6;
@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
                     temp.tokenImage.setX(leftTopX + (float) j * distanceBetweenCells);
                     temp.tokenImage.setY(leftTopY + (float) i * distanceBetweenCells);
                     temp.tokenImage.setImageResource(R.drawable.unoccupied);
-                    temp.tokenImage.setMaxHeight(140);
-                    temp.tokenImage.setMaxWidth(140);
+                    temp.tokenImage.setMaxHeight(150);
+                    temp.tokenImage.setMaxWidth(150);
                     board[i][j] = temp;
                     overall.addView(board[i][j].tokenImage);
                 }
@@ -220,6 +220,9 @@ public class MainActivity extends AppCompatActivity {
 
                         final int finalCol = col;
                         final int finalRow = j;
+                        final int prevPlayer = board[finalRow - 1][col].player;
+                        final int prevStrength = board[finalRow - 1][col].strength;
+
                         moveDown.setAnimationListener(new Animation.AnimationListener() {
                             @Override
                             public void onAnimationStart(Animation animation) {
@@ -228,22 +231,22 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onAnimationEnd(Animation animation) {
-                                if(board[finalRow - 1][finalCol].player == 1) {
-                                    if(board[finalRow - 1][finalCol].strength == 6) {
+                                if(prevPlayer == 1) {
+                                    if(prevStrength == 6) {
                                         board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.red1);
                                     }
-                                    else if(board[finalRow - 1][finalCol].strength == 3) {
+                                    else if(prevStrength == 3) {
                                         board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.red2);
                                     }
                                     else {
                                         board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.red3);
                                     }
                                 }
-                                else if(board[finalRow - 1][finalCol].player == 2) {
-                                    if(board[finalRow - 1][finalCol].strength == 6) {
+                                else if(prevPlayer == 2) {
+                                    if(prevStrength == 6) {
                                         board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.yellow1);
                                     }
-                                    else if(board[finalRow - 1][finalCol].strength == 3) {
+                                    else if(prevStrength == 3) {
                                         board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.yellow2);
                                     }
                                     else {
@@ -254,14 +257,17 @@ public class MainActivity extends AppCompatActivity {
                                     board[finalRow][finalCol].tokenImage.setImageResource(R.drawable.unoccupied);
                                 }
                                 //board[j][col].tokenImage = board[j - 1][col].tokenImage;
-                                board[finalRow][finalCol].player = board[finalRow - 1][finalCol].player;
-                                board[finalRow][finalCol].strength = board[finalRow - 1][finalCol].strength;
+                                //board[finalRow][finalCol].player = board[finalRow - 1][finalCol].player;
+                                //board[finalRow][finalCol].strength = board[finalRow - 1][finalCol].strength;
                             }
 
                             @Override
                             public void onAnimationRepeat(Animation animation) {
                             }
                         });
+                        board[finalRow][finalCol].player = board[finalRow - 1][finalCol].player;
+                        board[finalRow][finalCol].strength = board[finalRow - 1][finalCol].strength;
+                        board[j][col].tokenImage.startAnimation(moveDown);
                     }
                     //Insert new unoccupied token in row 0
                     board[0][col].player = 0;
@@ -269,100 +275,11 @@ public class MainActivity extends AppCompatActivity {
                     board[0][col].tokenImage.setImageResource(R.drawable.unoccupied);
                     //Reset i to 5
                     i = 5;
-                    return;
                 }
                 else {
                     i--;
                 }
-
             }
-            return;
-            /*
-            for(int i = 5; i >= 0; --i) {
-                topTokenRow = lowestRow(col);
-                //Only check if the strength is not 6
-                if(board[i][col].strength != 6) {
-                    tokenCount = i - topTokenRow - 1;
-                    //Check if number of tokens exceeds token strength
-                    if(tokenCount > board[i][col].strength) {
-                        //Fade broken token away
-                        //board[i][col].tokenImage.animate().alpha(0.0f).setDuration(200);
-                        //Move all tokens above it down by one spot
-                        for(int j = i; j > 0; --j) {
-                            //board[j][col].tokenImage.animate().translationYBy(distanceBetweenCells);
-                            if(board[j - 1][col].player == 1) {
-                                if(board[j - 1][col].strength == 6) {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.red1);
-                                }
-                                else if(board[j - 1][col].strength == 3) {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.red2);
-                                }
-                                else {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.red3);
-                                }
-                            }
-                            else if(board[j - 1][col].player == 2) {
-                                if(board[j - 1][col].strength == 6) {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.yellow1);
-                                }
-                                else if(board[j - 1][col].strength == 3) {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.yellow2);
-                                }
-                                else {
-                                    board[j][col].tokenImage.setImageResource(R.drawable.yellow3);
-                                }
-                            }
-                            else {
-                                board[j][col].tokenImage.setImageResource(R.drawable.unoccupied);
-                            }
-                            //board[j][col].tokenImage = board[j - 1][col].tokenImage;
-                            board[j][col].player = board[j - 1][col].player;
-                            board[j][col].strength = board[j - 1][col].strength;
-                        }
-                        //Insert new unoccupied token in row 0
-                        board[0][col].player = 0;
-                        board[0][col].strength = 6;
-                        board[0][col].tokenImage.setImageResource(R.drawable.unoccupied);
-                        //Reset i to 5
-                        i = 5;
-                    }
-                }
-            }
-            */
-            //Log.i("Info", "Breaking");
-            /*
-            int tokensToBreak = 0;
-            int lowRow = 0;
-            //Loop through necessary rows starting from bottom and ending at row 2
-            //Row 2 because the weakest token will break only with 2 tokens on top of it
-            for(int i = 5; i >= 2; --i) {
-                //If no player token is at this location, no need to look at rows above
-                //Break from inner loop and move on
-                //if(board[i][col].player == 0) {
-                    //break;
-                //}
-                //If player token at [j][col] is breakable, count how many tokens are above it
-                if(board[i][col].strength != 6) {
-                    int tokenCount = 0;
-                    for(int k = i - 1; k > 0; --k) {
-                        if(board[k][col].player != 0) {
-                            tokenCount++;
-                        }
-                    }
-                    //If there are more tokens than this token can support
-                    if(tokenCount > board[i][col].strength) {
-                        tokensToBreak++;
-                        if(lowRow == 0) {
-                            lowRow = i;
-                        }
-                    }
-                }
-            }
-            if(tokensToBreak > 0) {
-                //Break everything in one go to make sure no breaking affects other breaks
-                collapseTokens(lowRow, col, tokensToBreak);
-            }
-            */
         }
 
         //Returns row index of column that newly dropped token would end up in
@@ -560,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
             arrowColumn--;
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
-            nextToken.animate().translationXBy(-168).setDuration(50);
+            nextToken.animate().translationXBy(-distanceBetweenCells).setDuration(50);
             nextToken.setX(leftTopX + arrowColumn * distanceBetweenCells);
         }
     }
@@ -570,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
             arrowColumn++;
             //Move image to new position
             ImageView nextToken = findViewById(R.id.nextToken);
-            nextToken.animate().translationXBy(168).setDuration(50);
+            nextToken.animate().translationXBy(distanceBetweenCells).setDuration(50);
             nextToken.setX(leftTopX + arrowColumn * distanceBetweenCells);
         }
     }
